@@ -27,7 +27,7 @@ export default defineConfig({
   server: {
     headers: {
       "Content-Security-Policy":
-        "default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; connect-src 'self' wss://*.stadiumops.fifa2026.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:;",
+        "default-src 'self'; script-src 'self' 'wasm-unsafe-eval' 'unsafe-inline'; connect-src 'self' wss://*.stadiumops.fifa2026.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:;",
       "X-Frame-Options": "DENY",
       "Referrer-Policy": "strict-origin-when-cross-origin",
     },
