@@ -6,12 +6,20 @@ const frame: TelemetryFrame = {
   venueId: "ny-nj",
   timestamp: new Date().toISOString(),
   sequence: 1,
-  zones: { north: 60, south: 40, west: 95, east: 95, transit: 92, fan: 30, bowl: 40 },
+  zones: {
+    north: 60,
+    south: 40,
+    west: 95,
+    east: 95,
+    transit: 92,
+    fan: 30,
+    bowl: 40,
+  },
   waitMinutes: 12,
   accessibleRouteCoverage: 88,
   wasteDiversion: 70,
   source: "simulation",
-  quality: "clean"
+  quality: "clean",
 };
 
 describe("SpatialRouter", () => {

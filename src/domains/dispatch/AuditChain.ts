@@ -20,40 +20,67 @@ export class AuditChain {
 
   constructor(private readonly keyTtlMs = 86_400_000) {}
 
-  async signDecision(decision: DecisionEnvelope, operatorId: string): Promise<AuditSignature> {
+  async signDecision(
+    decision: DecisionEnvelope,
+    operatorId: string,
+  ): Promise<AuditSignature> {
     const keyPair = await this.activeKeyPair();
     const previousHash = this.#entries.at(-1)?.entryHash ?? "genesis";
     const signedAt = new Date().toISOString();
     const payload = JSON.stringify({
       decisionId: decision.id,
       operatorId,
-      approvedActions: decision.actions.filter((action) => action.requiresApproval).map((action) => action.id),
+      approvedActions: decision.actions
+        .filter((action) => action.requiresApproval)
+        .map((action) => action.id),
       previousHash,
-      signedAt
+      signedAt,
     });
-    const signatureBytes = await crypto.subtle.sign({ name: "Ed25519" }, keyPair.privateKey, new TextEncoder().encode(payload));
+    const signatureBytes = await crypto.subtle.sign(
+      { name: "Ed25519" },
+      keyPair.privateKey,
+      new TextEncoder().encode(payload),
+    );
     const signature = this.hex(signatureBytes);
     const entryHash = await this.sha256(`${payload}.${signature}`);
     const keyId = await this.keyId(keyPair.publicKey);
-    const entry = { decisionId: decision.id, operatorId, keyId, signature, signedAt, previousHash, entryHash };
+    const entry = {
+      decisionId: decision.id,
+      operatorId,
+      keyId,
+      signature,
+      signedAt,
+      previousHash,
+      entryHash,
+    };
     this.#entries.push(entry);
     return entry;
   }
 
-  async verify(decision: DecisionEnvelope, signature: AuditSignature, operatorId: string): Promise<boolean> {
+  async verify(
+    decision: DecisionEnvelope,
+    signature: AuditSignature,
+    operatorId: string,
+  ): Promise<boolean> {
     if (!this.#keyPair) return false;
     const payload = JSON.stringify({
       decisionId: decision.id,
       operatorId,
-      approvedActions: decision.actions.filter((action) => action.requiresApproval).map((action) => action.id),
+      approvedActions: decision.actions
+        .filter((action) => action.requiresApproval)
+        .map((action) => action.id),
       previousHash: signature.previousHash,
-      signedAt: signature.signedAt
+      signedAt: signature.signedAt,
     });
     return crypto.subtle.verify(
       { name: "Ed25519" },
       this.#keyPair.publicKey,
-      Uint8Array.from(signature.signature.match(/.{1,2}/g)?.map((byte) => Number.parseInt(byte, 16)) ?? []),
-      new TextEncoder().encode(payload)
+      Uint8Array.from(
+        signature.signature
+          .match(/.{1,2}/g)
+          ?.map((byte) => Number.parseInt(byte, 16)) ?? [],
+      ),
+      new TextEncoder().encode(payload),
     );
   }
 
@@ -62,9 +89,16 @@ export class AuditChain {
   }
 
   private async activeKeyPair(): Promise<CryptoKeyPair> {
-    if (!crypto.subtle) throw new Error("WebCrypto is required; fail closed without crypto.subtle.");
+    if (!crypto.subtle)
+      throw new Error(
+        "WebCrypto is required; fail closed without crypto.subtle.",
+      );
     if (!this.#keyPair || Date.now() - this.#keyCreatedAt > this.keyTtlMs) {
-      this.#keyPair = (await crypto.subtle.generateKey({ name: "Ed25519" }, true, ["sign", "verify"])) as CryptoKeyPair;
+      this.#keyPair = (await crypto.subtle.generateKey(
+        { name: "Ed25519" },
+        true,
+        ["sign", "verify"],
+      )) as CryptoKeyPair;
       this.#keyCreatedAt = Date.now();
     }
     return this.#keyPair;
@@ -76,11 +110,16 @@ export class AuditChain {
   }
 
   private async sha256(value: string): Promise<string> {
-    const digest = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(value));
+    const digest = await crypto.subtle.digest(
+      "SHA-256",
+      new TextEncoder().encode(value),
+    );
     return this.hex(digest);
   }
 
   private hex(buffer: ArrayBuffer): string {
-    return [...new Uint8Array(buffer)].map((byte) => byte.toString(16).padStart(2, "0")).join("");
+    return [...new Uint8Array(buffer)]
+      .map((byte) => byte.toString(16).padStart(2, "0"))
+      .join("");
   }
 }

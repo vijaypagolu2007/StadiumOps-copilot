@@ -1,10 +1,27 @@
-import type { DensityBand, SpatialRouteCheck, TelemetryFrame, ZoneId } from "@/shared/types";
+import type {
+  DensityBand,
+  SpatialRouteCheck,
+  TelemetryFrame,
+  ZoneId,
+} from "@/shared/types";
 import { densityBand } from "@/domains/crowd/density";
 
 const routes: Array<{ id: string; label: string; zones: ZoneId[] }> = [
-  { id: "transit-west-stepfree", label: "Transit Plaza to West Concourse step-free route", zones: ["transit", "west"] },
-  { id: "south-west-stepfree", label: "South Gate to West Concourse step-free route", zones: ["south", "west"] },
-  { id: "north-west-stepfree", label: "North Gate to West Concourse step-free route", zones: ["north", "west"] }
+  {
+    id: "transit-west-stepfree",
+    label: "Transit Plaza to West Concourse step-free route",
+    zones: ["transit", "west"],
+  },
+  {
+    id: "south-west-stepfree",
+    label: "South Gate to West Concourse step-free route",
+    zones: ["south", "west"],
+  },
+  {
+    id: "north-west-stepfree",
+    label: "North Gate to West Concourse step-free route",
+    zones: ["north", "west"],
+  },
 ];
 
 export function checkAccessibleRoutes(frame: TelemetryFrame): {
@@ -23,7 +40,7 @@ export function checkAccessibleRoutes(frame: TelemetryFrame): {
     return {
       ...route,
       status: blockers.length ? "blocked" : "clear",
-      blockers
+      blockers,
     };
   });
 
@@ -33,6 +50,6 @@ export function checkAccessibleRoutes(frame: TelemetryFrame): {
     recommendation: openRoute
       ? `${openRoute.label} is clear for accessible assistance.`
       : "All step-free assistance routes are blocked or uncertain; dispatch mobile carts before publishing guidance.",
-    routes: checks
+    routes: checks,
   };
 }

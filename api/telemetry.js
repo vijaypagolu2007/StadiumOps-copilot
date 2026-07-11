@@ -9,13 +9,15 @@ export default async function handler(req, res) {
     .map(([zone, value]) => ({
       id: typeof value === "number" ? `density-${zone}` : `fallback-${zone}`,
       zone,
-      priority: typeof value === "number" && value >= 90 ? "critical" : "high"
+      priority: typeof value === "number" && value >= 90 ? "critical" : "high",
     }));
 
   json(res, 200, {
     traceId: traceId(req),
     accepted: true,
-    quality: alerts.some((alert) => alert.id.startsWith("fallback")) ? "degraded" : "clean",
-    alerts
+    quality: alerts.some((alert) => alert.id.startsWith("fallback"))
+      ? "degraded"
+      : "clean",
+    alerts,
   });
 }

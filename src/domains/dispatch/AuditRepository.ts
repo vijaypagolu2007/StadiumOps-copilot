@@ -40,7 +40,7 @@ export class AuditRepository {
         const store = db.createObjectStore("entries", { keyPath: "entryHash" });
         store.createIndex("by-decision", "decisionId");
         store.createIndex("by-signed-at", "signedAt");
-      }
+      },
     });
     return this.#db;
   }

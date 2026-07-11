@@ -1,5 +1,11 @@
 import { createStore } from "zustand/vanilla";
-import type { ActionCommand, DecisionEnvelope, EdgeAlert, TelemetryFrame, VenueId } from "@/shared/types";
+import type {
+  ActionCommand,
+  DecisionEnvelope,
+  EdgeAlert,
+  TelemetryFrame,
+  VenueId,
+} from "@/shared/types";
 
 export interface OpsState {
   venueId: VenueId;
@@ -22,5 +28,5 @@ export const opsStore = createStore<OpsState>((set) => ({
   setVenue: (venueId) => set({ venueId }),
   setTelemetry: (telemetry, alerts) => set({ telemetry, alerts }),
   setDecision: (decision) => set({ decision, actions: decision.actions }),
-  setConnection: (connection) => set({ connection })
+  setConnection: (connection) => set({ connection }),
 }));

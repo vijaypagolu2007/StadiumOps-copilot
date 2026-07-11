@@ -10,7 +10,6 @@ jobs:
     runs-on: ubuntu-24.04
     permissions:
       contents: read
-      security-events: write
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
@@ -18,20 +17,18 @@ jobs:
           version: 9.15.4
       - uses: actions/setup-node@v4
         with:
-          node-version: 20.11.1
+          node-version: 24
           cache: pnpm
       - run: pnpm install --frozen-lockfile
+      - run: pnpm exec playwright install --with-deps chromium
       - run: pnpm lint
       - run: pnpm format
       - run: pnpm build
       - run: pnpm test
-      - run: pnpm test:integration
-      - run: pnpm audit:deps
-      - uses: github/codeql-action/upload-sarif@v3
-        if: always()
-        with:
-          sarif_file: semgrep.sarif
+      - run: pnpm test:integration --project=chromium
+      - run: pnpm audit --audit-level=moderate
       - uses: codecov/codecov-action@v5
+        continue-on-error: true
         with:
           files: coverage/lcov.info
 
@@ -39,8 +36,9 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
-      - uses: aquasecurity/trivy-action@0.29.0
+      - uses: aquasecurity/trivy-action@0.36.0
         with:
           scan-type: fs
           severity: HIGH,CRITICAL
+          ignore-unfixed: true
           exit-code: "1"

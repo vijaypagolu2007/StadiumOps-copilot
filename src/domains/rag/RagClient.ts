@@ -18,7 +18,10 @@ export class RagClient {
     if (existing) return existing;
 
     const request = new Promise<RetrievalChunk[]>((resolve, reject) => {
-      const timeout = window.setTimeout(() => reject(new Error("RAG worker timeout")), 750);
+      const timeout = window.setTimeout(
+        () => reject(new Error("RAG worker timeout")),
+        750,
+      );
       const listener = (event: MessageEvent) => {
         if (event.data.key !== key) return;
         window.clearTimeout(timeout);

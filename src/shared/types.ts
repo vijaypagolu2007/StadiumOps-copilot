@@ -24,7 +24,14 @@ export type ScenarioId =
   | "sustainability"
   | "volunteerGap";
 
-export type ZoneId = "north" | "south" | "west" | "east" | "transit" | "fan" | "bowl";
+export type ZoneId =
+  | "north"
+  | "south"
+  | "west"
+  | "east"
+  | "transit"
+  | "fan"
+  | "bowl";
 export type DensityBand = "low" | "watch" | "high" | "critical" | "fallback";
 export type Priority = "low" | "medium" | "high" | "critical";
 export type DispatchChannel =

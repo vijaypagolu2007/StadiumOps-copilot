@@ -1,5 +1,9 @@
 import { describe, expect, it } from "vitest";
-import { averageKnown, buildDensityBands, densityBand } from "@/domains/crowd/density";
+import {
+  averageKnown,
+  buildDensityBands,
+  densityBand,
+} from "@/domains/crowd/density";
 
 describe("density utilities", () => {
   it("bands critical density", () => {
@@ -16,7 +20,15 @@ describe("density utilities", () => {
 
   it("builds strict zone band objects", () => {
     expect(
-      buildDensityBands({ north: 91, south: 42, west: 61, east: 80, transit: null, fan: 20, bowl: 50 }).transit
+      buildDensityBands({
+        north: 91,
+        south: 42,
+        west: 61,
+        east: 80,
+        transit: null,
+        fan: 20,
+        bowl: 50,
+      }).transit,
     ).toBe("fallback");
   });
 });

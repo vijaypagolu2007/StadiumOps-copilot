@@ -6,6 +6,6 @@ export default function handler(req, res) {
     service: "stadiumops-copilot",
     version: process.env.VERCEL_GIT_COMMIT_SHA || "local",
     region: process.env.VERCEL_REGION || "local",
-    uptimeSeconds: Math.round(process.uptime())
+    uptimeSeconds: Math.round(process.uptime()),
   });
 }

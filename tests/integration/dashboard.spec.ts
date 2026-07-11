@@ -3,7 +3,9 @@ import AxeBuilder from "@axe-core/playwright";
 
 test("scenario selection to plan generation flow", async ({ page }) => {
   await page.goto("/");
-  await expect(page.getByRole("heading", { name: /StadiumOps Copilot/i })).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: /StadiumOps Copilot/i }),
+  ).toBeVisible();
 });
 
 test("approval controls stay keyboard reachable", async ({ page }) => {

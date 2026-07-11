@@ -16,7 +16,7 @@ export const VenueIdSchema = z.enum([
   "seattle",
   "sf-bay",
   "los-angeles",
-  "guadalajara"
+  "guadalajara",
 ]);
 
 export const ScenarioIdSchema = z.enum([
@@ -25,11 +25,25 @@ export const ScenarioIdSchema = z.enum([
   "stormDelay",
   "transitCrush",
   "sustainability",
-  "volunteerGap"
+  "volunteerGap",
 ]);
 
-export const ZoneIdSchema = z.enum(["north", "south", "west", "east", "transit", "fan", "bowl"]);
-export const DensityBandSchema = z.enum(["low", "watch", "high", "critical", "fallback"]);
+export const ZoneIdSchema = z.enum([
+  "north",
+  "south",
+  "west",
+  "east",
+  "transit",
+  "fan",
+  "bowl",
+]);
+export const DensityBandSchema = z.enum([
+  "low",
+  "watch",
+  "high",
+  "critical",
+  "fallback",
+]);
 export const PrioritySchema = z.enum(["low", "medium", "high", "critical"]);
 export const DispatchChannelSchema = z.enum([
   "app",
@@ -38,16 +52,22 @@ export const DispatchChannelSchema = z.enum([
   "volunteer-tablet",
   "transit-partner",
   "facilities",
-  "sustainability-team"
+  "sustainability-team",
 ]);
 
 const SafeTextSchema = z
   .string()
   .min(1)
   .max(1200)
-  .refine((value) => !/[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F]/.test(value), "control characters are not allowed")
+  .refine(
+    (value) => !/[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F]/.test(value),
+    "control characters are not allowed",
+  )
   .refine((value) => !/<\s*script/i.test(value), "script tags are not allowed")
-  .refine((value) => !/javascript\s*:/i.test(value), "javascript URLs are not allowed");
+  .refine(
+    (value) => !/javascript\s*:/i.test(value),
+    "javascript URLs are not allowed",
+  );
 
 export const TelemetryFrameSchema = z.object({
   venueId: VenueIdSchema,
@@ -58,7 +78,7 @@ export const TelemetryFrameSchema = z.object({
   accessibleRouteCoverage: z.number().min(0).max(100),
   wasteDiversion: z.number().min(0).max(100),
   source: z.enum(["edge-gateway", "replay", "simulation"]),
-  quality: z.enum(["clean", "degraded", "corrupt"])
+  quality: z.enum(["clean", "degraded", "corrupt"]),
 });
 
 export const CacheFingerprintSchema = z.object({
@@ -73,13 +93,13 @@ export const CacheFingerprintSchema = z.object({
     risk: DensityBandSchema,
     wait: DensityBandSchema,
     access: DensityBandSchema,
-    waste: DensityBandSchema
+    waste: DensityBandSchema,
   }),
   verification: z.object({
     status: z.enum(["awaiting", "verified", "below_target", "negative"]),
-    complianceBand: z.union([DensityBandSchema, z.literal("negative")])
+    complianceBand: z.union([DensityBandSchema, z.literal("negative")]),
   }),
-  edgeAlertIds: z.array(z.string().regex(/^[a-z0-9-]+$/i)).max(30)
+  edgeAlertIds: z.array(z.string().regex(/^[a-z0-9-]+$/i)).max(30),
 });
 
 export const ActionCommandSchema = z.object({
@@ -96,9 +116,9 @@ export const ActionCommandSchema = z.object({
       label: SafeTextSchema,
       from: ZoneIdSchema.optional(),
       to: ZoneIdSchema.optional(),
-      zoneId: ZoneIdSchema.optional()
+      zoneId: ZoneIdSchema.optional(),
     })
-    .optional()
+    .optional(),
 });
 
 export const DecisionEnvelopeSchema = z.object({
@@ -114,8 +134,8 @@ export const DecisionEnvelopeSchema = z.object({
       channels: z.tuple([z.literal("app"), z.literal("led")]),
       appText: SafeTextSchema,
       ledText: SafeTextSchema,
-      dir: z.enum(["ltr", "rtl"])
-    })
+      dir: z.enum(["ltr", "rtl"]),
+    }),
   ),
   verification: z.object({
     targetPercent: z.number().min(0).max(100),
@@ -124,7 +144,7 @@ export const DecisionEnvelopeSchema = z.object({
     status: z.enum(["awaiting", "verified", "below_target", "negative"]),
     evidence: SafeTextSchema,
     nextAction: SafeTextSchema,
-    lastChecked: SafeTextSchema
+    lastChecked: SafeTextSchema,
   }),
   spatialChecks: z.object({
     accessibleAssistanceSafe: z.boolean(),
@@ -139,11 +159,11 @@ export const DecisionEnvelopeSchema = z.object({
           z.object({
             zoneId: ZoneIdSchema,
             band: DensityBandSchema,
-            value: z.number().min(0).max(100).nullable()
-          })
-        )
-      })
-    )
+            value: z.number().min(0).max(100).nullable(),
+          }),
+        ),
+      }),
+    ),
   }),
   edgeAlerts: z.array(
     z.object({
@@ -151,8 +171,8 @@ export const DecisionEnvelopeSchema = z.object({
       priority: PrioritySchema,
       title: SafeTextSchema,
       summary: SafeTextSchema,
-      zoneId: ZoneIdSchema.optional()
-    })
+      zoneId: ZoneIdSchema.optional(),
+    }),
   ),
   grounding: z.array(
     z.object({
@@ -161,15 +181,15 @@ export const DecisionEnvelopeSchema = z.object({
       tags: z.array(z.string()),
       text: SafeTextSchema,
       sourceUri: z.string(),
-      score: z.number().finite()
-    })
+      score: z.number().finite(),
+    }),
   ),
   guardrails: z.object({
     allowed: z.boolean(),
     score: z.number().min(0).max(100),
     issues: z.array(SafeTextSchema),
     canaryLeaked: z.boolean(),
-    rateLimited: z.boolean()
+    rateLimited: z.boolean(),
   }),
   actions: z.array(ActionCommandSchema).min(1).max(20),
   dispatchLock: z.object({
@@ -177,7 +197,7 @@ export const DecisionEnvelopeSchema = z.object({
     requiresSignature: z.boolean(),
     keyId: z.string().optional(),
     signature: z.string().optional(),
-    signedAt: z.string().datetime().optional()
+    signedAt: z.string().datetime().optional(),
   }),
   runtime: z.object({
     schemaVersion: z.literal("stadiumops.action.v1"),
@@ -185,8 +205,8 @@ export const DecisionEnvelopeSchema = z.object({
     fallbackState: z.enum(["not-needed", "local-rulebook"]),
     fingerprint: CacheFingerprintSchema,
     traceId: z.string(),
-    generatedAt: z.string().datetime()
-  })
+    generatedAt: z.string().datetime(),
+  }),
 });
 
 export type DecisionEnvelopeDto = z.infer<typeof DecisionEnvelopeSchema>;

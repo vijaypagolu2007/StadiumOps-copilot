@@ -1,0 +1,95 @@
+import js from "@eslint/js";
+import tsPlugin from "@typescript-eslint/eslint-plugin";
+import tsParser from "@typescript-eslint/parser";
+
+export default [
+  {
+    ignores: ["dist/**", "node_modules/**", "coverage/**", "api/**"],
+  },
+  js.configs.recommended,
+  {
+    files: ["**/*.{ts,tsx,mjs,cjs,js}"],
+    languageOptions: {
+      parser: tsParser,
+      parserOptions: {
+        ecmaVersion: "latest",
+        sourceType: "module",
+        ecmaFeatures: { jsx: true },
+      },
+      globals: {
+        console: "readonly",
+        process: "readonly",
+        setTimeout: "readonly",
+        clearTimeout: "readonly",
+        setInterval: "readonly",
+        clearInterval: "readonly",
+        fetch: "readonly",
+        URL: "readonly",
+        URLSearchParams: "readonly",
+        structuredClone: "readonly",
+        crypto: "readonly",
+        performance: "readonly",
+        self: "readonly",
+        navigator: "readonly",
+        window: "readonly",
+        document: "readonly",
+        HTMLElement: "readonly",
+        Event: "readonly",
+        CustomEvent: "readonly",
+        Worker: "readonly",
+        MessageEvent: "readonly",
+        Blob: "readonly",
+        File: "readonly",
+        FormData: "readonly",
+        Headers: "readonly",
+        Request: "readonly",
+        Response: "readonly",
+        AbortController: "readonly",
+        TextEncoder: "readonly",
+        TextDecoder: "readonly",
+        atob: "readonly",
+        btoa: "readonly",
+        queueMicrotask: "readonly",
+        requestAnimationFrame: "readonly",
+        cancelAnimationFrame: "readonly",
+        localStorage: "readonly",
+        sessionStorage: "readonly",
+        indexedDB: "readonly",
+        IDBKeyRange: "readonly",
+        customElements: "readonly",
+        CryptoKeyPair: "readonly",
+        CryptoKey: "readonly",
+        AbortSignal: "readonly",
+        WebSocket: "readonly",
+        TrustedTypePolicy: "readonly",
+      },
+    },
+    plugins: {
+      "@typescript-eslint": tsPlugin,
+    },
+    rules: {
+      ...tsPlugin.configs.recommended.rules,
+      "@typescript-eslint/no-unused-vars": [
+        "error",
+        { argsIgnorePattern: "^_" },
+      ],
+      "no-control-regex": "off",
+    },
+  },
+  {
+    files: [
+      "vite.config.ts",
+      "vitest.config.ts",
+      "playwright.config.ts",
+      "rollup.digital-twin.config.mjs",
+    ],
+    languageOptions: {
+      globals: {
+        __dirname: "readonly",
+        __filename: "readonly",
+        module: "readonly",
+        require: "readonly",
+      },
+    },
+  },
+];

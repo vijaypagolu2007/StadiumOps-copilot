@@ -6,9 +6,9 @@ export default {
     {
       file: "dist/digital-twin/index.js",
       format: "esm",
-      sourcemap: true
-    }
+      sourcemap: true,
+    },
   ],
   external: ["solid-js", "solid-js/web"],
-  plugins: [nodeResolve({ extensions: [".ts", ".tsx", ".js"] })]
+  plugins: [nodeResolve({ extensions: [".ts", ".tsx", ".js"] })],
 };

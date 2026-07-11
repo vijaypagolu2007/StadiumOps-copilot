@@ -9,7 +9,9 @@ export class TelemetryService {
   constructor(
     private readonly endpoint: string,
     private readonly onFrame: (frame: TelemetryFrame) => void,
-    private readonly onStatus: (status: "connected" | "reconnecting" | "closed") => void
+    private readonly onStatus: (
+      status: "connected" | "reconnecting" | "closed",
+    ) => void,
   ) {}
 
   connect(): void {
@@ -20,7 +22,10 @@ export class TelemetryService {
       this.onStatus("connected");
     };
     this.#socket.onmessage = (event) => {
-      const payload = event.data instanceof ArrayBuffer ? decode(new Uint8Array(event.data)) : JSON.parse(String(event.data));
+      const payload =
+        event.data instanceof ArrayBuffer
+          ? decode(new Uint8Array(event.data))
+          : JSON.parse(String(event.data));
       const parsed = TelemetryFrameSchema.safeParse(payload);
       if (parsed.success) this.onFrame(parsed.data);
     };
@@ -39,7 +44,9 @@ export class TelemetryService {
 
   private scheduleReconnect(): void {
     this.onStatus("reconnecting");
-    const delay = Math.min(30_000, 500 * 2 ** this.#reconnectAttempt) + Math.floor(Math.random() * 250);
+    const delay =
+      Math.min(30_000, 500 * 2 ** this.#reconnectAttempt) +
+      Math.floor(Math.random() * 250);
     this.#reconnectAttempt += 1;
     window.setTimeout(() => this.connect(), delay);
   }

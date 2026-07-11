@@ -6,6 +6,6 @@ export default function handler(req, res) {
     traceId: traceId(req),
     job: "audit-reconcile",
     reconciled: true,
-    checkedAt: new Date().toISOString()
+    checkedAt: new Date().toISOString(),
   });
 }

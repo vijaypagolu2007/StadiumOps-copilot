@@ -9,7 +9,7 @@ describe("fan compliance", () => {
       afterEastCount: 1120,
       southDeltaCount: 0,
       appOpenCount: 0,
-      qrScanCount: 0
+      qrScanCount: 0,
     });
     expect(result.status).toBe("negative");
   });

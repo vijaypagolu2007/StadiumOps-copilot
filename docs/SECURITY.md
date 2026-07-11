@@ -2,14 +2,14 @@
 
 ## Threat Model
 
-| Threat | Risk | Mitigation |
-| --- | --- | --- |
-| Prompt injection in operator override | Unsafe public guidance | 25+ regex patterns, semantic similarity score, canary token, rate limit |
-| Forged approval | Unauthorized broadcast | Ed25519 signatures, dispatch API verification, key rotation |
-| Telemetry spoofing | Bad crowd decisions | Edge validation, schema rejection, fallback zone bands |
-| XSS via generated text | Dashboard compromise | Zod safe text schema, Trusted Types policy plan, CSP |
-| Audit tampering | Loss of accountability | Hash-linked audit chain, S3 replication, Glacier retention |
-| Dependency confusion | Supply-chain compromise | Private registry scope, exact dependency versions, lockfile enforcement |
+| Threat                                | Risk                    | Mitigation                                                              |
+| ------------------------------------- | ----------------------- | ----------------------------------------------------------------------- |
+| Prompt injection in operator override | Unsafe public guidance  | 25+ regex patterns, semantic similarity score, canary token, rate limit |
+| Forged approval                       | Unauthorized broadcast  | Ed25519 signatures, dispatch API verification, key rotation             |
+| Telemetry spoofing                    | Bad crowd decisions     | Edge validation, schema rejection, fallback zone bands                  |
+| XSS via generated text                | Dashboard compromise    | Zod safe text schema, Trusted Types policy plan, CSP                    |
+| Audit tampering                       | Loss of accountability  | Hash-linked audit chain, S3 replication, Glacier retention              |
+| Dependency confusion                  | Supply-chain compromise | Private registry scope, exact dependency versions, lockfile enforcement |
 
 ## Runtime Headers
 

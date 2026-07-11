@@ -10,7 +10,7 @@ describe("Zod schemas", () => {
       dispatch: "Send staff",
       channel: "radio",
       requiresApproval: true,
-      physicalBackup: false
+      physicalBackup: false,
     });
     expect(result.success).toBe(false);
   });

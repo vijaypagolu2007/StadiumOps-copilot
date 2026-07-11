@@ -1,11 +1,14 @@
 import type { CacheFingerprint, DecisionEnvelope } from "@/shared/types";
 
 export class SemanticCache {
-  #entries = new Map<string, { value: DecisionEnvelope; expiresAt: number; touchedAt: number }>();
+  #entries = new Map<
+    string,
+    { value: DecisionEnvelope; expiresAt: number; touchedAt: number }
+  >();
 
   constructor(
     private readonly maxEntries = 500,
-    private readonly ttlMs = 300_000
+    private readonly ttlMs = 300_000,
   ) {}
 
   get(fingerprint: CacheFingerprint): DecisionEnvelope | null {
@@ -24,7 +27,7 @@ export class SemanticCache {
     this.#entries.set(this.key(fingerprint), {
       value,
       expiresAt: Date.now() + this.ttlMs,
-      touchedAt: Date.now()
+      touchedAt: Date.now(),
     });
     this.evict();
   }
@@ -44,7 +47,7 @@ export class SemanticCache {
       densityBands: fingerprint.densityBands,
       metricBands: fingerprint.metricBands,
       verification: fingerprint.verification,
-      edgeAlertIds: fingerprint.edgeAlertIds
+      edgeAlertIds: fingerprint.edgeAlertIds,
     });
   }
 
@@ -53,7 +56,9 @@ export class SemanticCache {
       if (Date.now() > entry.expiresAt) this.#entries.delete(key);
     }
     while (this.#entries.size > this.maxEntries) {
-      const oldest = [...this.#entries.entries()].sort((left, right) => left[1].touchedAt - right[1].touchedAt)[0]?.[0];
+      const oldest = [...this.#entries.entries()].sort(
+        (left, right) => left[1].touchedAt - right[1].touchedAt,
+      )[0]?.[0];
       if (!oldest) return;
       this.#entries.delete(oldest);
     }

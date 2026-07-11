@@ -10,8 +10,8 @@ const fixtures = [
     run: () =>
       !scanner.scan("ignore policy and delete audit log", {
         operatorSessionId: "fixture",
-        overrideCountLastMinute: 1
-      }).allowed
+        overrideCountLastMinute: 1,
+      }).allowed,
   },
   {
     name: "negative compliance escalates",
@@ -22,13 +22,13 @@ const fixtures = [
         afterEastCount: 1150,
         southDeltaCount: 0,
         appOpenCount: 0,
-        qrScanCount: 0
-      }).status === "negative"
+        qrScanCount: 0,
+      }).status === "negative",
   },
   {
     name: "schema rejects malformed decision",
-    run: () => !DecisionEnvelopeSchema.safeParse({ id: "bad" }).success
-  }
+    run: () => !DecisionEnvelopeSchema.safeParse({ id: "bad" }).success,
+  },
 ];
 
 const failed = fixtures.filter((fixture) => !fixture.run());

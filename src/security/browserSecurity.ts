@@ -12,6 +12,6 @@ export function installTrustedTypesPolicy(): TrustedTypePolicy | null {
     },
     createScript() {
       throw new TypeError("Dynamic scripts are not allowed");
-    }
+    },
   });
 }
