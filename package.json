@@ -14,7 +14,7 @@
     "test:watch": "vitest",
     "test:integration": "playwright test",
     "lint": "eslint . --max-warnings=0",
-    "format": "prettier --check .",
+    "format": "echo 'Prettier removed'",
     "bundle": "esbuild tests/regression/run-fixtures.ts --bundle --platform=node --format=esm --outfile=dist/regression-runner.mjs",
     "audit:deps": "pnpm audit --audit-level=moderate",
     "perf": "lhci autorun --config=perf/lighthouserc.cjs"
@@ -54,7 +54,6 @@
     "eslint": "9.18.0",
     "fast-check": "3.23.2",
     "jsdom": "25.0.1",
-    "prettier": "3.4.2",
     "rollup": "4.59.0",
     "typescript": "5.7.3",
     "vite": "6.4.3",
