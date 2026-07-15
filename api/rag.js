@@ -1,4 +1,10 @@
-import { json, readJson, requireMethod, traceId } from "./_shared.js";
+import {
+  json,
+  readJson,
+  requireMethod,
+  requireSameOrigin,
+  traceId,
+} from "./_shared.js";
 
 const chunks = [
   {
@@ -20,7 +26,9 @@ const chunks = [
 
 export default async function handler(req, res) {
   if (!requireMethod(req, res, "POST")) return;
-  const body = await readJson(req);
+  if (!requireSameOrigin(req, res)) return;
+  const body = await readJson(req, res);
+  if (!body) return;
   const tags = new Set([body.scenarioId, ...(body.tags || [])]);
   const results = chunks
     .map((chunk) => ({

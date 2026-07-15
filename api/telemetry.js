@@ -1,8 +1,16 @@
-import { json, readJson, requireMethod, traceId } from "./_shared.js";
+import {
+  json,
+  readJson,
+  requireMethod,
+  requireSameOrigin,
+  traceId,
+} from "./_shared.js";
 
 export default async function handler(req, res) {
   if (!requireMethod(req, res, "POST")) return;
-  const body = await readJson(req);
+  if (!requireSameOrigin(req, res)) return;
+  const body = await readJson(req, res);
+  if (!body) return;
   const zones = body.zones || {};
   const alerts = Object.entries(zones)
     .filter(([, value]) => typeof value !== "number" || value >= 90)

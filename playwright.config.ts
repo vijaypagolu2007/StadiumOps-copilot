@@ -10,7 +10,7 @@ export default defineConfig({
     screenshot: "only-on-failure",
   },
   webServer: {
-    command: "pnpm build && pnpm vite preview --host 127.0.0.1 --port 4173",
+    command: "pnpm build && node ./node_modules/vite/bin/vite.js preview --host 127.0.0.1 --port 4173 --configLoader runner",
     url: "http://127.0.0.1:4173",
     reuseExistingServer: !process.env.CI,
   },

@@ -4,6 +4,7 @@ import {
   readJson,
   requireEnv,
   requireMethod,
+  requireSameOrigin,
   traceId,
 } from "./_shared.js";
 
@@ -15,13 +16,15 @@ function sign(payload, secret) {
 
 export default async function handler(req, res) {
   if (!requireMethod(req, res, "POST")) return;
+  if (!requireSameOrigin(req, res)) return;
   const env = requireEnv(["AUDIT_SIGNING_PRIVATE_KEY"]);
   if (!env.ok) {
     json(res, 503, { error: "missing_env", missing: env.missing });
     return;
   }
 
-  const body = await readJson(req);
+  const body = await readJson(req, res);
+  if (!body) return;
   const expected = sign(
     body.payload || {},
     process.env.AUDIT_SIGNING_PRIVATE_KEY,
