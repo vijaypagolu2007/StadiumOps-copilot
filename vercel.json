@@ -1,5 +1,23 @@
-{
-  "buildCommand": "pnpm build",
-  "outputDirectory": "dist",
-  "installCommand": "pnpm install --frozen-lockfile"
-}
+# 1. Overwrite pnpm-workspace.yaml
+@"
+packages:
+  - "."
+
+onlyBuiltDependencies:
+  - esbuild
+  - msgpackr-extract
+"@ | Set-Content "pnpm-workspace.yaml" -Encoding UTF8
+
+# 2. Append overrides to .npmrc
+@"
+pnpm.overrides.tmp=>=0.2.6
+pnpm.overrides.uuid=>=11.1.1
+"@ | Add-Content ".npmrc" -Encoding UTF8
+
+# 3. Delete vercel.json
+Remove-Item "vercel.json"
+
+# 4. Commit and push
+git add pnpm-workspace.yaml .npmrc vercel.json
+git commit -m "fix pnpm-workspace.yaml schema, remove vercel.json"
+git push origin main
