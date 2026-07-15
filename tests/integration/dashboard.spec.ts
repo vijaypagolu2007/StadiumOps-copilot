@@ -40,7 +40,11 @@ test("operator can generate and review a safe plan", async ({ page }) => {
   await page.getByRole("button", { name: "Generate safe plan" }).click();
   await expect(page.getByRole("heading", { name: "Recommended plan" })).toBeVisible();
   await expect(page.getByText("AI generated")).toBeVisible();
-  await expect(page.getByText("Stage east concourse staff")).toBeVisible();
+  await expect(
+    page
+      .getByLabel("Generated operating plan")
+      .getByText("Stage east concourse staff", { exact: true }),
+  ).toBeVisible();
 });
 
 test("dashboard passes basic axe scan", async ({ page }) => {
