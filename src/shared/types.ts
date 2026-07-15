@@ -32,6 +32,7 @@ export type ZoneId =
   | "transit"
   | "fan"
   | "bowl";
+
 export type DensityBand = "low" | "watch" | "high" | "critical" | "fallback";
 export type Priority = "low" | "medium" | "high" | "critical";
 export type DispatchChannel =
@@ -41,7 +42,8 @@ export type DispatchChannel =
   | "volunteer-tablet"
   | "transit-partner"
   | "facilities"
-  | "sustainability-team";
+  | "sustainability-team"
+  | string;
 
 export interface Venue {
   id: VenueId;
@@ -53,41 +55,23 @@ export interface Venue {
   baseRisk: number;
 }
 
-export interface TelemetryFrame {
-  venueId: VenueId;
-  timestamp: string;
-  sequence: number;
-  zones: Record<ZoneId, number | null>;
-  waitMinutes: number;
-  accessibleRouteCoverage: number;
-  wasteDiversion: number;
-  source: "edge-gateway" | "replay" | "simulation";
-  quality: "clean" | "degraded" | "corrupt";
-}
-
 export interface EdgeAlert {
   id: string;
   priority: Priority;
   title: string;
   summary: string;
-  zoneId?: ZoneId;
 }
 
 export interface RetrievalChunk {
   id: string;
-  version: string;
-  tags: string[];
   text: string;
-  sourceUri: string;
   score: number;
 }
 
 export interface GuardrailResult {
-  allowed: boolean;
-  score: number;
+  blocked: boolean;
+  passed: boolean;
   issues: string[];
-  canaryLeaked: boolean;
-  rateLimited: boolean;
 }
 
 export interface MultilingualMessage {
@@ -96,15 +80,14 @@ export interface MultilingualMessage {
   channels: Array<"app" | "led">;
   appText: string;
   ledText: string;
-  dir: "ltr" | "rtl";
 }
 
 export interface SpatialRouteCheck {
   id: string;
   label: string;
-  status: "clear" | "blocked" | "uncertain";
-  zones: ZoneId[];
-  blockers: Array<{ zoneId: ZoneId; band: DensityBand; value: number | null }>;
+  status: "clear" | "blocked_or_uncertain";
+  zones: string[];
+  blockers: Array<{ zone: string; band: DensityBand; value: number | null }>;
 }
 
 export interface FanVerification {
@@ -115,6 +98,7 @@ export interface FanVerification {
   evidence: string;
   nextAction: string;
   lastChecked: string;
+  statusCopy?: string;
 }
 
 export interface ActionCommand {
@@ -125,21 +109,15 @@ export interface ActionCommand {
   channel: DispatchChannel;
   requiresApproval: boolean;
   physicalBackup: boolean;
-  mapOverlay?: {
-    kind: "lane" | "route" | "marker" | "zone";
-    label: string;
-    from?: ZoneId;
-    to?: ZoneId;
-    zoneId?: ZoneId;
-  };
+  mapOverlay?: { label: string };
 }
 
 export interface CacheFingerprint {
-  schemaVersion: "stadiumops.cache-key.v2";
+  schemaVersion: "stadiumops.cache-key.v2" | string;
   venueId: VenueId;
   scenarioId: ScenarioId;
   language: string;
-  mode: "balanced" | "safety" | "fan" | "sustainability";
+  mode: "balanced" | "safety" | "fan" | "sustainability" | string;
   telemetryQuality: "clean" | "fallback";
   densityBands: Record<ZoneId, DensityBand>;
   metricBands: {
@@ -157,16 +135,25 @@ export interface CacheFingerprint {
 
 export interface DispatchLock {
   status: "locked" | "unlocked" | "rejected";
-  requiresSignature: boolean;
-  keyId?: string;
-  signature?: string;
-  signedAt?: string;
+  requiresHmac: boolean;
+  authorizedOperatorRoles: string[];
+  lastDispatchResult: string;
+  operator?: string;
+  signatureHash?: string;
+}
+
+export interface RuntimeMetrics {
+  risk: number;
+  wait: number;
+  access: number;
+  waste: number;
 }
 
 export interface DecisionEnvelope {
   id: string;
-  venueId: VenueId;
   scenarioId: ScenarioId;
+  venueId: VenueId;
+  venueName: string;
   language: string;
   fanMessage: string;
   multilingualMessages: MultilingualMessage[];
@@ -175,18 +162,46 @@ export interface DecisionEnvelope {
     accessibleAssistanceSafe: boolean;
     recommendation: string;
     routes: SpatialRouteCheck[];
+    selectedRouteId?: string;
   };
+  metrics: RuntimeMetrics;
   edgeAlerts: EdgeAlert[];
   grounding: RetrievalChunk[];
   guardrails: GuardrailResult;
   actions: ActionCommand[];
   dispatchLock: DispatchLock;
   runtime: {
-    schemaVersion: "stadiumops.action.v1";
-    generationMode: "llm-tool-call" | "local-rule-state-machine";
-    fallbackState: "not-needed" | "local-rulebook";
+    source: string;
+    cacheHit: boolean;
+    cacheAgeSeconds: number;
     fingerprint: CacheFingerprint;
-    traceId: string;
+    cacheKeySchema: string;
     generatedAt: string;
+    schemaVersion: "stadiumops.action.v1" | string;
+    generationMode: string;
+    fallbackState: string;
+    fallbackReason: string;
+    schemaValid?: boolean;
+    schemaErrors?: string[];
+  };
+}
+
+export interface AuditEntry {
+  decisionId: string;
+  operator: string;
+  timestamp: string;
+  venueId: VenueId;
+  scenarioId: ScenarioId;
+  fanMessage: string;
+  approvedActions: Array<{ id: string; title: string; channel: string }>;
+  previousHash: string;
+  payload: any;
+  signature: string;
+  entryHash: string;
+  actionCount: number;
+  dispatchResult: {
+    accepted: boolean;
+    reason: string;
+    acceptedAt?: string;
   };
 }

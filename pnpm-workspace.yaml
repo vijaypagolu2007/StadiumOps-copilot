@@ -6,6 +6,10 @@ allowBuilds:
 minimumReleaseAgeExclude:
   - uuid@11.1.1
   - tmp@0.2.6
+  - cookie@0.7.0
+  - '@eslint/plugin-kit@0.3.4'
 overrides:
+  '@eslint/plugin-kit@<0.3.4': ^0.3.4
+  cookie@<0.7.0: ^0.7.0
   tmp@<0.2.6: ^0.2.6
   uuid@<11.1.1: ^11.1.1
