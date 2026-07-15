@@ -1,11 +1,14 @@
 import path from "path";
+import { fileURLToPath } from "node:url";
 import { defineConfig } from "vite";
 import solid from "vite-plugin-solid";
+
+const rootDir = path.dirname(fileURLToPath(import.meta.url));
 
 export default defineConfig({
   resolve: {
     alias: {
-      "@": path.resolve(__dirname, "./src"),
+      "@": path.resolve(rootDir, "./src"),
     },
   },
   plugins: [solid()],

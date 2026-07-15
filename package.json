@@ -3,14 +3,16 @@
   "version": "1.0.0",
   "private": true,
   "type": "module",
+  "packageManager": "pnpm@11.7.0",
   "engines": {
     "node": "24.x"
   },
   "scripts": {
-    "dev": "vite --host 0.0.0.0",
-    "build": "vite build",
+    "dev": "vite --host 0.0.0.0 --configLoader runner",
+    "build": "vite build --configLoader runner",
+    "preview": "vite preview --configLoader runner",
     "build:web-component": "rollup -c rollup.digital-twin.config.mjs",
-    "test": "vitest run --coverage",
+    "test": "vitest run --coverage --configLoader runner",
     "test:watch": "vitest",
     "test:integration": "playwright test",
     "lint": "eslint . --max-warnings=0",
@@ -59,9 +61,5 @@
     "vite": "6.4.3",
     "vite-plugin-solid": "2.11.0",
     "vitest": "3.2.6"
-  },
-  "resolutions": {
-    "tmp": ">=0.2.6",
-    "uuid": ">=11.1.1"
   }
 }
