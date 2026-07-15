@@ -101,7 +101,7 @@ export function App() {
       <section id="command" aria-label="World Cup 2026 StadiumOps command center">
         <header class="hero">
           <p class="eyebrow">Stadium operations copilot</p>
-          <h1>World Cup 2026 StadiumOps</h1>
+          <h1>World Cup 2026 StadiumOps Copilot</h1>
           <p>Generate grounded, supervisor-approved operating plans from the current venue scenario.</p>
         </header>
 
