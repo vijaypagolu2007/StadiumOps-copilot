@@ -77,15 +77,19 @@ export function App() {
         frame,
       });
       const actions = planActions(nextPlan);
-      opsStore.setVenue(venueId());
-      opsStore.setTelemetry(frame, actions.map((action) => ({
-        id: action.id,
-        priority: action.priority,
-        title: action.title,
-        summary: action.dispatch,
-        zoneId: action.mapOverlay?.zoneId,
-      })));
       setPlan(nextPlan);
+      try {
+        opsStore.setVenue(venueId());
+        opsStore.setTelemetry(frame, actions.map((action) => ({
+          id: action.id,
+          priority: action.priority,
+          title: action.title,
+          summary: action.dispatch,
+          zoneId: action.mapOverlay?.zoneId,
+        })));
+      } catch {
+        // The generated plan remains usable even if local dashboard synchronization fails.
+      }
       setStatus(nextPlan.source === "openai" ? "AI plan generated; supervisor approval remains required." : "Safety fallback generated; configure OPENAI_API_KEY to enable AI planning.");
     } catch (caught) {
       setError(caught instanceof Error ? caught.message : "Unable to generate a plan.");
