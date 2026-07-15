@@ -34,7 +34,7 @@ export const DigitalTwin: Component<{
 
   const levelClass = (id: ZoneId) => {
     const band = densityBand(val(id));
-    return band === "fallback" ? "unknown" : band;
+    return band === "fallback" ? "unknown" : band === "watch" ? "medium" : band;
   };
 
   const getOverlays = () => {

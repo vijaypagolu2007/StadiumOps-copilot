@@ -147,30 +147,26 @@ export const CopilotPanel: Component<CopilotPanelProps> = (props) => {
           </div>
         </form>
 
-        <section class="response" id="copilotResponse" aria-live="polite">
-          <Show when={props.decision}>
-            {(decision) => (
-              <>
-                <p class="section-label">Generated fan message</p>
-                <div class="message-card">
-                  <p>{decision().fanMessage}</p>
-                </div>
-                <Show when={decision().multilingualMessages && decision().multilingualMessages.length > 0}>
-                  <p class="section-label" style="margin-top:14px;">Multilingual variants sent to app/LED</p>
-                  <For each={decision().multilingualMessages.filter(m => m.language !== decision().language)}>
-                    {(msg) => (
-                      <div class="message-card language-variant">
-                        <p><strong>{msg.label}</strong>: {msg.appText}</p>
-                      </div>
-                    )}
-                  </For>
-                </Show>
-              </>
-            )}
-          </Show>
-        </section>
-        
-        <section class="response" id="regressionOutput" aria-live="polite" hidden></section>
+        <Show when={props.decision}>
+          {(decision) => (
+            <section class="response" id="copilotResponse" aria-live="polite">
+              <p class="section-label">Generated fan message</p>
+              <div class="message-card">
+                <p>{decision().fanMessage}</p>
+              </div>
+              <Show when={decision().multilingualMessages && decision().multilingualMessages.length > 0}>
+                <p class="section-label" style="margin-top:14px;">Multilingual variants sent to app/LED</p>
+                <For each={decision().multilingualMessages!.filter(m => m.language !== decision().language)}>
+                  {(msg) => (
+                    <div class="message-card language-variant">
+                      <p><strong>{msg.label}</strong>: {msg.appText}</p>
+                    </div>
+                  )}
+                </For>
+              </Show>
+            </section>
+          )}
+        </Show>
       </div>
     </article>
   );
