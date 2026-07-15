@@ -1,6 +1,6 @@
 import { Component, For } from "solid-js";
 import { DigitalTwin } from "@/domains/crowd/DigitalTwin";
-import { ActionCommand, ZoneId } from "@/shared/types";
+import { ZoneId } from "@/shared/types";
 import { zoneKeys } from "@/shared/data";
 import { densityBand, levelFor, levelText, getVenue } from "@/domains/decision";
 import { StoreState } from "@/store/useOpsStore";
@@ -54,7 +54,7 @@ export const DigitalTwinPanel: Component<DigitalTwinPanelProps> = (props) => {
       </div>
       <div class="panel-body">
         <div class="map-wrap">
-          <DigitalTwin density={props.state.currentZones || {} as any} actions={props.state.decision?.actions || []} />
+          <DigitalTwin density={props.state.currentZones || {} as Record<string, number>} actions={props.state.decision?.actions || []} />
           
           <div class="legend" aria-label="Crowd density legend">
             <span><i class="swatch" style="background: var(--low);"></i> Low</span>

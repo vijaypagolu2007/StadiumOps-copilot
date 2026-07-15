@@ -1,10 +1,10 @@
 import { Component, For } from "solid-js";
-import { densityBand, waitBand, averageKnown, zonePercent, getScenario, getVenue, clamp, levelFor } from "@/domains/decision";
+import { averageKnown, zonePercent, getScenario, getVenue, clamp, levelFor } from "@/domains/decision";
 import { StoreState } from "@/store/useOpsStore";
 
 export const LiveSignalsPanel: Component<{ state: StoreState }> = (props) => {
   const metrics = () => props.state.currentMetrics || { wait: 11, access: 96, waste: 71, risk: 62 };
-  const zoneValues = () => props.state.currentZones || {} as any;
+  const zoneValues = () => props.state.currentZones || {} as Record<string, number>;
   const venue = () => getVenue(props.state.venueId);
   const scenario = () => getScenario(props.state.scenarioId);
   

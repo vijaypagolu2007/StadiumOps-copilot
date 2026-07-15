@@ -366,7 +366,7 @@ export function addMultilingualDispatch(actions: ActionCommand[], multilingualMe
   ];
 }
 
-export function localFallbackActions(scenario: any, scenarioId: string, edgeAlerts: EdgeAlert[]): ActionCommand[] {
+export function localFallbackActions(scenario: any, scenarioId: string, _edgeAlerts: EdgeAlert[]): ActionCommand[] {
   const fallbackActions = scenarioActionsToObjects(scenario, scenarioId).map((action) => ({
     ...action,
     id: `${action.id}-local`,
@@ -387,11 +387,8 @@ export function localFallbackActions(scenario: any, scenarioId: string, edgeAler
   return fallbackActions;
 }
 
-export function buildVerificationPlan(state: StoreState, zoneValues: any, metric: RuntimeMetrics): FanVerification {
+export function buildVerificationPlan(state: StoreState, _zoneValues: any, _metric: RuntimeMetrics): FanVerification {
   const base = state.fanVerification;
-  const targetLabel = state.scenarioId === "transitCrush"
-    ? "Hold exit-wave compliance above 80%"
-    : "Redirect at least 12% of East Gate arrivals to South Gate";
   const statusCopy = base.status === "below_target"
     ? "Compliance below target; increase physical signage, LED frequency, and volunteer intercepts."
     : base.status === "verified"

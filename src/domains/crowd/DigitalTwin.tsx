@@ -38,7 +38,7 @@ export const DigitalTwin: Component<{
   };
 
   const getOverlays = () => {
-    const parts: any[] = [];
+    const parts: import('solid-js').JSX.Element[] = [];
     props.actions.forEach((action) => {
       const text = `${action.title} ${action.dispatch}`.toLowerCase();
       if (text.includes("overflow lanes") || text.includes("e4-e7")) {

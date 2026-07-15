@@ -1,6 +1,6 @@
 import { createSignal, onCleanup, onMount } from "solid-js";
 import { opsStore } from "@/store/useOpsStore";
-import type { ZoneId, ScenarioId } from "@/shared/types";
+import type { VenueId } from "@/shared/types";
 
 import { Header } from "./components/Header";
 import { KPIBar } from "./components/KPIBar";
@@ -27,7 +27,7 @@ export function App() {
     <main class="app">
       <Header 
         venueId={state().venueId} 
-        onVenueChange={(id) => opsStore.getState().setField("venueId", id as any)}
+        onVenueChange={(id) => opsStore.getState().setField("venueId", id as VenueId)}
         language={state().language}
         onLanguageChange={(lang) => opsStore.getState().setField("language", lang)}
       />
@@ -49,7 +49,7 @@ export function App() {
         <CopilotPanel 
           decision={state().decision}
           mode={state().mode}
-          onModeChange={(m) => opsStore.getState().setField("mode", m as any)}
+          onModeChange={(m) => opsStore.getState().setField("mode", m as string)}
           scenarioId={state().scenarioId}
           onScenarioChange={(s) => opsStore.getState().setField("scenarioId", s)}
           prompt={state().prompt}
@@ -64,7 +64,7 @@ export function App() {
           }}
           onToggleChange={(key, val) => {
             if (key === "cache") opsStore.getState().setField("semanticCacheEnabled", val);
-            else opsStore.getState().setField(key as any, val);
+            else opsStore.getState().setField(key as keyof ReturnType<typeof opsStore.getState>, val);
           }}
           onGenerate={(e) => {
             e.preventDefault();
