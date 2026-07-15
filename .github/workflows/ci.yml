@@ -23,6 +23,15 @@ jobs:
       - run: pnpm build
       - run: pnpm test
       - run: pnpm test:integration --project=chromium
+      - name: Upload Playwright failure artifacts
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-results
+          path: |
+            playwright-report
+            test-results
+          if-no-files-found: ignore
       - run: pnpm audit --audit-level=moderate
       - uses: codecov/codecov-action@v5
         continue-on-error: true
