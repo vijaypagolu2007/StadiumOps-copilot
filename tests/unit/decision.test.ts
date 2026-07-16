@@ -26,7 +26,6 @@ import {
   buildVerificationPlan,
   addVerificationActions,
 } from "@/domains/decision";
-import type { StoreState } from "@/store/useOpsStore";
 
 /* ──────────────────────────────────
    Utility helpers
