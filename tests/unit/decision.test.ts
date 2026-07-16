@@ -25,7 +25,11 @@ import {
   simpleHash,
   buildVerificationPlan,
   addVerificationActions,
+  buildDecision,
+  signPayload,
+  sha256Hex,
 } from "@/domains/decision";
+import type { StoreState } from "@/store/useOpsStore";
 import crypto from "crypto";
 
 // Polyfill WebCrypto for older JSDOM / Node environments in evaluator
@@ -538,5 +542,78 @@ describe("simpleHash", () => {
 
   it("produces different hashes for different inputs", () => {
     expect(simpleHash("hello")).not.toBe(simpleHash("world"));
+  });
+});
+
+describe("buildDecision", () => {
+  it("orchestrates the complete pipeline successfully", () => {
+    const mockState: StoreState = {
+      venueId: "ny-nj",
+      scenarioId: "gateSurge",
+      language: "en",
+      mode: "safety",
+      apiDegraded: false,
+      llmLatencyMs: 500,
+      corruption: false,
+      operatorOverride: "normal update",
+      tick: 1,
+      feedback: { eastRelief: 0, westRelief: 0 },
+      fanVerification: {
+        status: "verified",
+        targetPercent: 12,
+        observedPercent: 15,
+        complianceRate: 100,
+        evidence: "none",
+        nextAction: "none",
+        lastChecked: new Date().toISOString(),
+      },
+      zones: {
+        north: 30, south: 20, west: 50, east: 40, transit: 30, fan: 20, bowl: 10
+      },
+      metrics: {
+        risk: 20, wait: 5, access: 95, waste: 80
+      }
+    } as any;
+
+    const envelope = buildDecision(mockState, "app");
+    expect(envelope.id).toMatch(/^decision-/);
+    expect(envelope.venueName).toContain("New York");
+    expect(envelope.actions.length).toBeGreaterThan(0);
+    expect(envelope.dispatchLock.status).toBe("locked");
+  });
+
+  it("triggers local fallback when latency is high", () => {
+    const mockState = {
+      venueId: "toronto",
+      scenarioId: "gateSurge",
+      language: "en",
+      mode: "balanced",
+      apiDegraded: false,
+      llmLatencyMs: 5000,
+      operatorOverride: "",
+      tick: 1,
+      feedback: { eastRelief: 0, westRelief: 0 },
+      fanVerification: { status: "pending" },
+      zones: { north: 30, south: 20, west: 50, east: 40, transit: 30, fan: 20, bowl: 10 }
+    } as any;
+
+    const envelope = buildDecision(mockState, "app");
+    expect(envelope.runtime.generationMode).toBe("local-rule-state-machine");
+    expect(envelope.runtime.fallbackReason).toContain("llm-latency");
+  });
+});
+
+describe("Cryptographic Signing", () => {
+  it("signs payload using WebCrypto when available", async () => {
+    const sig = await signPayload({ test: "data" }, "ops-supervisor-demo");
+    expect(sig).toBeDefined();
+    expect(typeof sig).toBe("string");
+  });
+
+  it("hashes hex strings securely", async () => {
+    const hash1 = await sha256Hex("hello world");
+    const hash2 = await sha256Hex("hello world");
+    expect(hash1).toBe(hash2);
+    expect(hash1.length).toBeGreaterThan(10);
   });
 });

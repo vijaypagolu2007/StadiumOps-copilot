@@ -24,6 +24,8 @@ export default defineConfig({
         "src/domains/analytics/**/*.ts",
         "src/domains/crowd/density.ts",
         "src/domains/guardrails/**/*.ts",
+        "src/domains/decision.ts",
+        "src/domains/llm/LLMPipeline.ts",
         "src/shared/schemas.ts",
       ],
       thresholds: {
