@@ -124,9 +124,16 @@ export const ActionCommandSchema = z.object({
 export const DecisionEnvelopeSchema = z.object({
   id: z.string().regex(/^decision-[a-z0-9-]+$/i),
   venueId: VenueIdSchema,
+  venueName: z.string(),
   scenarioId: ScenarioIdSchema,
   language: z.string().min(2).max(12),
   fanMessage: SafeTextSchema,
+  metrics: z.object({
+    risk: z.number(),
+    wait: z.number(),
+    access: z.number(),
+    waste: z.number(),
+  }),
   multilingualMessages: z.array(
     z.object({
       language: z.string().min(2).max(12),
@@ -185,7 +192,8 @@ export const DecisionEnvelopeSchema = z.object({
     }),
   ),
   guardrails: z.object({
-    allowed: z.boolean(),
+    blocked: z.boolean(),
+    passed: z.boolean(),
     score: z.number().min(0).max(100),
     issues: z.array(SafeTextSchema),
     canaryLeaked: z.boolean(),

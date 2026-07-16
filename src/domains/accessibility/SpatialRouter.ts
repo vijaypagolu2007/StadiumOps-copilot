@@ -32,8 +32,8 @@ export function checkAccessibleRoutes(frame: TelemetryFrame): {
   const checks = routes.map((route): SpatialRouteCheck => {
     const blockers = route.zones
       .map((zoneId) => {
-        const value = frame.zones[zoneId];
-        return { zoneId, value, band: densityBand(value) as DensityBand };
+        const value = frame.zones[zoneId] ?? null;
+        return { zoneId, value, band: densityBand(value ?? 0) as DensityBand };
       })
       .filter((zone) => zone.band === "critical" || zone.band === "fallback");
 

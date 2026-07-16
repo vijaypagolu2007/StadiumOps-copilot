@@ -322,7 +322,7 @@ export function checkSpatialAccessibility(zoneValues: any, scenarioId: string) {
 
   const checkedRoutes = routes.map((route) => {
     const blockers = route.zones
-      .map((zone) => ({ zone, value: zoneValues[zone], band: densityBand(zoneValues[zone]) }))
+      .map((zone) => ({ zoneId: zone as ZoneId, value: zoneValues[zone] ?? null, band: densityBand(zoneValues[zone] ?? 0) }))
       .filter((zone) => zone.band === "critical" || zone.band === "fallback");
     return {
       ...route,

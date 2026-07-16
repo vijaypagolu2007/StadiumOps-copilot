@@ -49,7 +49,7 @@ export function App() {
         <CopilotPanel 
           decision={state().decision}
           mode={state().mode}
-          onModeChange={(m) => opsStore.getState().setField("mode", m as string)}
+          onModeChange={(m) => opsStore.getState().setField("mode", m as any)}
           scenarioId={state().scenarioId}
           onScenarioChange={(s) => opsStore.getState().setField("scenarioId", s)}
           prompt={state().prompt}
@@ -64,7 +64,7 @@ export function App() {
           }}
           onToggleChange={(key, val) => {
             if (key === "cache") opsStore.getState().setField("semanticCacheEnabled", val);
-            else opsStore.getState().setField(key as keyof ReturnType<typeof opsStore.getState>, val);
+            else opsStore.getState().setField(key as any, val);
           }}
           onGenerate={(e) => {
             e.preventDefault();

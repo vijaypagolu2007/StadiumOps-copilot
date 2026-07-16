@@ -58,7 +58,7 @@ export class LLMPipeline {
       overrideCountLastMinute: 1,
     });
     const useLocalRulebook =
-      (input.observedLlmLatencyMs ?? 0) > 3000 || !guardrails.allowed;
+      (input.observedLlmLatencyMs ?? 0) > 3000 || !guardrails.passed;
 
     const base = this.localRulebook(
       input,
@@ -138,7 +138,14 @@ export class LLMPipeline {
     return {
       id: `decision-${uuid()}`,
       venueId: input.frame.venueId,
+      venueName: input.frame.venueId,
       scenarioId: input.scenarioId,
+      metrics: {
+        risk: 0,
+        wait: 0,
+        access: 0,
+        waste: 0,
+      },
       language: input.language,
       fanMessage:
         multilingualMessages[0]?.appText ?? "Follow staff directions.",
@@ -157,7 +164,8 @@ export class LLMPipeline {
       edgeAlerts: input.edgeAlerts,
       grounding: input.grounding,
       guardrails: {
-        allowed: true,
+        passed: true,
+        blocked: false,
         score: 0,
         issues: [],
         canaryLeaked: false,
@@ -183,7 +191,7 @@ export class LLMPipeline {
           mode: "balanced",
           telemetryQuality:
             input.frame.quality === "clean" ? "clean" : "fallback",
-          densityBands: buildDensityBands(input.frame.zones),
+          densityBands: buildDensityBands(input.frame.zones as any) as any,
           metricBands: {
             risk: densityBand(
               Math.max(

@@ -7,8 +7,8 @@ self.onmessage = (event: MessageEvent) => {
   const chunks = topologyKnowledge
     .map((chunk) => ({
       ...chunk,
-      score: chunk.tags.reduce(
-        (score, tag) => score + (tags.has(tag) ? 2 : 0),
+      score: (chunk.tags || []).reduce(
+        (score: number, tag: string) => score + (tags.has(tag) ? 2 : 0),
         0,
       ),
     }))

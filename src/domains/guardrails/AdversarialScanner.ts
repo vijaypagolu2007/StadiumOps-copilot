@@ -154,7 +154,8 @@ export class AdversarialScanner {
     }
 
     return {
-      allowed: score < 30,
+      blocked: score >= 30,
+      passed: score < 30,
       score: Math.min(100, score),
       issues,
       canaryLeaked,

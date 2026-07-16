@@ -10,7 +10,7 @@ describe("AdversarialScanner", () => {
         overrideCountLastMinute: 1,
       },
     );
-    expect(result.allowed).toBe(false);
+    expect(result.passed).toBe(false);
     expect(result.issues).toContain("audit-tamper");
   });
 

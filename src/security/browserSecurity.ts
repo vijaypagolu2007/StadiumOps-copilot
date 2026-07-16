@@ -1,7 +1,7 @@
-export function installTrustedTypesPolicy(): TrustedTypePolicy | null {
+export function installTrustedTypesPolicy(): any | null {
   if (!("trustedTypes" in window)) return null;
-  return window.trustedTypes.createPolicy("stadiumops", {
-    createHTML(input) {
+  return (window as any).trustedTypes.createPolicy("stadiumops", {
+    createHTML(input: string) {
       if (/<\s*script|javascript\s*:/i.test(input)) {
         throw new TypeError("Unsafe HTML rejected by Trusted Types policy");
       }
