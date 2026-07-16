@@ -3,6 +3,31 @@ import { LLMPipeline } from "@/domains/llm/LLMPipeline";
 import type { LLMPipelineInput, ModelProvider } from "@/domains/llm/LLMPipeline";
 import type { AuditChain } from "@/domains/dispatch/AuditChain";
 import type { TelemetryFrame } from "@/shared/types";
+import crypto from "crypto";
+
+// Polyfill WebCrypto (required for uuid and subtle crypto in older JSDOM)
+if (typeof globalThis.crypto === "undefined") {
+  Object.defineProperty(globalThis, "crypto", {
+    value: {
+      getRandomValues: (arr: any) => crypto.randomFillSync(arr),
+      subtle: {
+        digest: async (algo: string, data: Uint8Array) => {
+          return crypto.createHash("sha256").update(data).digest();
+        },
+      },
+    },
+    configurable: true,
+  });
+} else if (!globalThis.crypto.subtle) {
+  Object.defineProperty(globalThis.crypto, "subtle", {
+    value: {
+      digest: async (algo: string, data: Uint8Array) => {
+        return crypto.createHash("sha256").update(data).digest();
+      },
+    },
+    configurable: true,
+  });
+}
 
 /** Minimal telemetry frame shared across tests */
 const baseFrame: TelemetryFrame = {

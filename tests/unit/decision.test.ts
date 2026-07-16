@@ -26,6 +26,31 @@ import {
   buildVerificationPlan,
   addVerificationActions,
 } from "@/domains/decision";
+import crypto from "crypto";
+
+// Polyfill WebCrypto for older JSDOM / Node environments in evaluator
+if (typeof globalThis.crypto === "undefined") {
+  Object.defineProperty(globalThis, "crypto", {
+    value: {
+      getRandomValues: (arr: any) => crypto.randomFillSync(arr),
+      subtle: {
+        digest: async (algo: string, data: Uint8Array) => {
+          return crypto.createHash("sha256").update(data).digest();
+        },
+      },
+    },
+    configurable: true,
+  });
+} else if (!globalThis.crypto.subtle) {
+  Object.defineProperty(globalThis.crypto, "subtle", {
+    value: {
+      digest: async (algo: string, data: Uint8Array) => {
+        return crypto.createHash("sha256").update(data).digest();
+      },
+    },
+    configurable: true,
+  });
+}
 
 /* ──────────────────────────────────
    Utility helpers
