@@ -96,13 +96,13 @@ export const DigitalTwin: Component<{
       </defs>
       <rect x="26" y="26" width="588" height="468" rx="28" fill="#eef7ef" stroke="#d5e4d6" stroke-width="2"></rect>
       
-      <rect class={`map-zone ${levelClass("north")}`} x="166" y="34" width="308" height="76" rx="12" role="img"></rect>
-      <rect class={`map-zone ${levelClass("south")}`} x="166" y="410" width="308" height="76" rx="12" role="img"></rect>
-      <rect class={`map-zone ${levelClass("west")}`} x="42" y="132" width="108" height="256" rx="14" role="img"></rect>
-      <rect class={`map-zone ${levelClass("east")}`} x="490" y="132" width="108" height="256" rx="14" role="img"></rect>
-      <rect class={`map-zone ${levelClass("transit")}`} x="40" y="34" width="104" height="76" rx="12" role="img"></rect>
-      <rect class={`map-zone ${levelClass("fan")}`} x="496" y="34" width="104" height="76" rx="12" role="img"></rect>
-      <ellipse class={`map-zone ${levelClass("bowl")}`} cx="320" cy="260" rx="194" ry="138" role="img"></ellipse>
+      <rect class={`map-zone ${levelClass("north")}`} x="166" y="34" width="308" height="76" rx="12" role="img" aria-label="North Gate"></rect>
+      <rect class={`map-zone ${levelClass("south")}`} x="166" y="410" width="308" height="76" rx="12" role="img" aria-label="South Gate"></rect>
+      <rect class={`map-zone ${levelClass("west")}`} x="42" y="132" width="108" height="256" rx="14" role="img" aria-label="West Concourse"></rect>
+      <rect class={`map-zone ${levelClass("east")}`} x="490" y="132" width="108" height="256" rx="14" role="img" aria-label="East Concourse"></rect>
+      <rect class={`map-zone ${levelClass("transit")}`} x="40" y="34" width="104" height="76" rx="12" role="img" aria-label="Transit Plaza"></rect>
+      <rect class={`map-zone ${levelClass("fan")}`} x="496" y="34" width="104" height="76" rx="12" role="img" aria-label="Fan Zone"></rect>
+      <ellipse class={`map-zone ${levelClass("bowl")}`} cx="320" cy="260" rx="194" ry="138" role="img" aria-label="Lower Bowl"></ellipse>
       
       <rect x="226" y="196" width="188" height="128" rx="10" fill="#dff4e6" stroke="#9fd6af" stroke-width="2"></rect>
       <line x1="320" y1="196" x2="320" y2="324" stroke="#9fd6af" stroke-width="2"></line>
@@ -132,7 +132,7 @@ export const DigitalTwin: Component<{
       
       <text class="map-small" x="338" y="300">Step-free route</text>
       
-      <g aria-label="Generated action map overlays">
+      <g role="group" aria-label="Generated action map overlays">
         <For each={getOverlays()}>{(overlay) => overlay}</For>
       </g>
     </svg>
