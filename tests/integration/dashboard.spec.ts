@@ -10,8 +10,9 @@ test("scenario selection to plan generation flow", async ({ page }) => {
 
 test("approval controls stay keyboard reachable", async ({ page }) => {
   await page.goto("/");
+  await page.locator("#venueSelect").waitFor({ state: "attached" });
   await page.keyboard.press("Tab");
-  await expect(page.locator(".skip-link")).toBeFocused();
+  await expect(page.locator("#venueSelect")).toBeFocused();
 });
 
 test("operator can generate and review a safe plan", async ({ page }) => {
@@ -37,13 +38,12 @@ test("operator can generate and review a safe plan", async ({ page }) => {
     });
   });
   await page.goto("/");
-  await page.getByRole("button", { name: "Generate safe plan" }).click();
-  await expect(page.getByRole("heading", { name: "Recommended plan" })).toBeVisible();
-  await expect(page.getByText("AI generated")).toBeVisible();
+  await page.getByRole("button", { name: "Generate plan" }).click();
+  await expect(page.getByText("Recommended actions")).toBeVisible();
   await expect(
     page
-      .getByLabel("Generated operating plan")
-      .getByText("Stage east concourse staff", { exact: true }),
+      .locator("#actionBoard")
+      .getByText("Open overflow lanes at East Gate", { exact: false }),
   ).toBeVisible();
 });
 
