@@ -14,6 +14,10 @@ import { buildMultilingualMessages } from "@/domains/i18n/Translator";
 import { AdversarialScanner } from "@/domains/guardrails/AdversarialScanner";
 import type { AuditChain } from "@/domains/dispatch/AuditChain";
 
+/**
+ * Represents a tool call the LLM can invoke during structured generation.
+ * Tools provide real-time venue data (transit, weather, facilities, volunteers).
+ */
 export interface LLMToolCall {
   name:
     | "queryTransit"
@@ -23,6 +27,7 @@ export interface LLMToolCall {
   arguments: Record<string, unknown>;
 }
 
+/** Interface for pluggable LLM model providers (e.g., OpenAI, Gemini). */
 export interface ModelProvider {
   generate(input: {
     model: string;
@@ -34,6 +39,7 @@ export interface ModelProvider {
   }): Promise<unknown>;
 }
 
+/** Input data required to generate a DecisionEnvelope via the LLM pipeline. */
 export interface LLMPipelineInput {
   frame: TelemetryFrame;
   scenarioId: ScenarioId;
@@ -44,6 +50,13 @@ export interface LLMPipelineInput {
   observedLlmLatencyMs?: number;
 }
 
+/**
+ * Orchestrates GenAI decision generation with built-in safety:
+ * 1. Adversarial scanning of operator overrides
+ * 2. Latency-aware fallback to deterministic local rulebook
+ * 3. Schema validation of LLM output
+ * 4. Cryptographic approval signing via AuditChain
+ */
 export class LLMPipeline {
   constructor(
     private readonly provider: ModelProvider,
@@ -51,6 +64,7 @@ export class LLMPipeline {
     private readonly scanner = new AdversarialScanner(),
   ) {}
 
+  /** Generates a DecisionEnvelope, falling back to local rules if LLM is slow or input is adversarial. */
   async generateDecision(input: LLMPipelineInput): Promise<DecisionEnvelope> {
     const traceId = uuid();
     const guardrails = this.scanner.scan(input.operatorOverride, {
@@ -88,6 +102,7 @@ export class LLMPipeline {
     }
   }
 
+  /** Cryptographically signs and unlocks a decision for dispatch after operator approval. */
   async approve(
     decision: DecisionEnvelope,
     operatorId: string,
@@ -105,6 +120,7 @@ export class LLMPipeline {
     };
   }
 
+  /** Deterministic rule-based decision generation that runs without any LLM call. */
   private localRulebook(
     input: LLMPipelineInput,
     traceId: string,
@@ -214,6 +230,7 @@ export class LLMPipeline {
     };
   }
 
+  /** Constructs the system prompt with RAG-retrieved topology chunks. */
   private systemPrompt(chunks: RetrievalChunk[]): string {
     return [
       "You are StadiumOps Copilot. Return only JSON matching DecisionEnvelope.",
@@ -223,12 +240,14 @@ export class LLMPipeline {
     ].join("\n");
   }
 
+  /** Selects the model tier based on alert severity (critical → gpt-4o, otherwise gpt-4o-mini). */
   private modelFor(alerts: EdgeAlert[]): string {
     return alerts.some((alert) => alert.priority === "critical")
       ? "gpt-4o"
       : "gpt-4o-mini";
   }
 
+  /** Returns the set of tool definitions the LLM can invoke during generation. */
   private toolDefinitions(): LLMToolCall[] {
     return [
       { name: "queryTransit", arguments: { venueId: "string" } },

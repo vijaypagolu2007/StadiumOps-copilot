@@ -1,3 +1,4 @@
+
 import {
   venues,
   scenarios,
@@ -22,32 +23,39 @@ import type {
 } from "@/shared/types";
 import { StoreState } from "@/store/useOpsStore";
 
+/** Constrains a numeric value to a [min, max] range. */
 export function clamp(value: number, min: number, max: number) {
   return Math.max(min, Math.min(max, value));
 }
 
+/** Type guard: returns true if value is a finite number between 0 and 100 inclusive. */
 export function isValidPercent(value: any): value is number {
   return Number.isFinite(value) && value >= 0 && value <= 100;
 }
 
+/** Safely extracts a zone percentage, returning `fallback` for invalid telemetry. */
 export function zonePercent(value: any, fallback = 50) {
   return isValidPercent(value) ? clamp(value, 0, 100) : fallback;
 }
 
+/** Averages only the valid percent values in an array, ignoring corrupt/null entries. */
 export function averageKnown(values: any[], fallback = 50) {
   const clean = values.filter(isValidPercent);
   if (!clean.length) return fallback;
   return Math.round(clean.reduce((sum, value) => sum + value, 0) / clean.length);
 }
 
+/** Resolves a venue configuration by ID, defaulting to the first venue if not found. */
 export function getVenue(venueId: string) {
   return venues.find((venue) => venue.id === venueId) || venues[0]!;
 }
 
+/** Resolves a scenario definition by ID, defaulting to gateSurge if not found. */
 export function getScenario(scenarioId: string) {
   return scenarios[scenarioId] || scenarios["gateSurge"];
 }
 
+/** Maps a percentage to a severity level: critical (≥90), high (≥76), medium (≥56), low, or unknown. */
 export function levelFor(value: any) {
   if (!isValidPercent(value)) return "unknown";
   if (value >= 90) return "critical";
@@ -62,6 +70,7 @@ export function levelText(value: any) {
   return level === "critical" ? "Critical" : level === "high" ? "High" : level === "medium" ? "Watch" : "Low";
 }
 
+/** Maps a zone density percentage to a DensityBand for cache fingerprinting. */
 export function densityBand(value: any): DensityBand {
   if (!isValidPercent(value)) return "fallback";
   if (value >= 90) return "critical";
@@ -77,6 +86,7 @@ export function waitBand(value: any): DensityBand {
   return "low";
 }
 
+/** Validates a string is safe from XSS, control chars, and within max length (1200). */
 export function strictString(value: any) {
   return typeof value === "string"
     && value.length <= 1200
@@ -85,6 +95,7 @@ export function strictString(value: any) {
     && !/javascript\s*:/i.test(value);
 }
 
+/** Strips control characters and neutralizes script/javascript payloads in fan-facing text. */
 export function sanitizeText(value: any) {
   return String(value)
     .replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F]/g, " ")
@@ -93,6 +104,7 @@ export function sanitizeText(value: any) {
     .trim();
 }
 
+/** Returns risk/wait/access/waste metric offsets for the selected operating mode. */
 export function modeAdjustment(mode: string) {
   return {
     balanced: { risk: 0, wait: 0, access: 0, waste: 0 },
@@ -211,6 +223,10 @@ export function retrieveGrounding(state: StoreState, venue: any, scenario: any, 
     }));
 }
 
+/**
+ * Runs red-team guardrail checks against operator override text.
+ * Detects prompt injection, audit tampering, broadcast bypass, and context-aware safety flags.
+ */
 export function redTeamOverride(text: string, state: StoreState, edgeAlerts: EdgeAlert[]): GuardrailResult {
   const value = (text || "").toLowerCase();
   const issues: string[] = [];
@@ -304,6 +320,10 @@ export function buildMultilingualMessages(scenarioId: string) {
   });
 }
 
+/**
+ * Checks step-free accessibility routes against current zone density.
+ * Returns which routes are clear vs blocked, and a recommendation for operators.
+ */
 export function checkSpatialAccessibility(zoneValues: any, scenarioId: string) {
   const routes = [
     {
@@ -345,6 +365,7 @@ export function checkSpatialAccessibility(zoneValues: any, scenarioId: string) {
   };
 }
 
+/** Appends an accessibility cart dispatch notice to fan messages when step-free routes are blocked. */
 export function applySpatialMessageGuard(fanMessage: string, spatialChecks: any) {
   if (spatialChecks.accessibleAssistanceSafe) return fanMessage;
   return `${fanMessage} Staff are dispatching mobile accessibility carts because one or more step-free paths are blocked or uncertain.`;
@@ -418,6 +439,10 @@ export function addVerificationActions(actions: ActionCommand[], verification: F
   ];
 }
 
+/**
+ * Orchestrates the complete decision generation pipeline:
+ * telemetry → edge alerts → RAG grounding → guardrails → spatial checks → actions → envelope.
+ */
 export function buildDecision(state: StoreState, source: string): DecisionEnvelope {
   const venue = getVenue(state.venueId);
   const scenario = getScenario(state.scenarioId);
