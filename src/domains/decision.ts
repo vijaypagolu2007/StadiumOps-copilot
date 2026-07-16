@@ -34,12 +34,12 @@ export function isValidPercent(value: any): value is number {
 }
 
 /** Safely extracts a zone percentage, returning `fallback` for invalid telemetry. */
-export function zonePercent(value: any, fallback = 50) {
+export function zonePercent(value: unknown, fallback = 50) {
   return isValidPercent(value) ? clamp(value, 0, 100) : fallback;
 }
 
 /** Averages only the valid percent values in an array, ignoring corrupt/null entries. */
-export function averageKnown(values: any[], fallback = 50) {
+export function averageKnown(values: unknown[], fallback = 50) {
   const clean = values.filter(isValidPercent);
   if (!clean.length) return fallback;
   return Math.round(clean.reduce((sum, value) => sum + value, 0) / clean.length);
@@ -56,7 +56,7 @@ export function getScenario(scenarioId: string) {
 }
 
 /** Maps a percentage to a severity level: critical (≥90), high (≥76), medium (≥56), low, or unknown. */
-export function levelFor(value: any) {
+export function levelFor(value: unknown) {
   if (!isValidPercent(value)) return "unknown";
   if (value >= 90) return "critical";
   if (value >= 76) return "high";
@@ -64,14 +64,14 @@ export function levelFor(value: any) {
   return "low";
 }
 
-export function levelText(value: any) {
+export function levelText(value: unknown) {
   const level = levelFor(value);
   if (level === "unknown") return "Fallback";
   return level === "critical" ? "Critical" : level === "high" ? "High" : level === "medium" ? "Watch" : "Low";
 }
 
 /** Maps a zone density percentage to a DensityBand for cache fingerprinting. */
-export function densityBand(value: any): DensityBand {
+export function densityBand(value: unknown): DensityBand {
   if (!isValidPercent(value)) return "fallback";
   if (value >= 90) return "critical";
   if (value >= 76) return "high";
@@ -79,7 +79,8 @@ export function densityBand(value: any): DensityBand {
   return "low";
 }
 
-export function waitBand(value: any): DensityBand {
+export function waitBand(value: unknown): DensityBand {
+  if (typeof value !== "number") return "fallback";
   if (value >= 22) return "critical";
   if (value >= 15) return "high";
   if (value >= 8) return "watch";
@@ -87,7 +88,7 @@ export function waitBand(value: any): DensityBand {
 }
 
 /** Validates a string is safe from XSS, control chars, and within max length (1200). */
-export function strictString(value: any) {
+export function strictString(value: unknown) {
   return typeof value === "string"
     && value.length <= 1200
     && !/[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F]/.test(value)
@@ -96,7 +97,7 @@ export function strictString(value: any) {
 }
 
 /** Strips control characters and neutralizes script/javascript payloads in fan-facing text. */
-export function sanitizeText(value: any) {
+export function sanitizeText(value: unknown) {
   return String(value)
     .replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F]/g, " ")
     .replace(/<\s*script/gi, "blocked-script")
@@ -146,7 +147,7 @@ export function getZones(state: StoreState) {
   return values;
 }
 
-export function computeEdgeAlerts(zoneValues: any, metric: RuntimeMetrics): EdgeAlert[] {
+export function computeEdgeAlerts(zoneValues: Record<string, number | null>, metric: RuntimeMetrics): EdgeAlert[] {
   const alerts: EdgeAlert[] = [];
   zoneKeys.forEach(([key, label]) => {
     const rawValue = zoneValues[key];
@@ -259,7 +260,7 @@ export function redTeamOverride(text: string, state: StoreState, edgeAlerts: Edg
   };
 }
 
-export function channelForAction(title: string): any {
+export function channelForAction(title: string): string {
   const value = title.toLowerCase();
   if (value.includes("transit") || value.includes("rail") || value.includes("shuttle")) return "transit-partner";
   if (value.includes("vendor") || value.includes("green") || value.includes("waste") || value.includes("refill")) return "sustainability-team";
@@ -324,7 +325,7 @@ export function buildMultilingualMessages(scenarioId: string) {
  * Checks step-free accessibility routes against current zone density.
  * Returns which routes are clear vs blocked, and a recommendation for operators.
  */
-export function checkSpatialAccessibility(zoneValues: any, scenarioId: string) {
+export function checkSpatialAccessibility(zoneValues: Record<string, number | null>, scenarioId: string) {
   const routes = [
     {
       id: "transit-to-west-access",
@@ -366,12 +367,12 @@ export function checkSpatialAccessibility(zoneValues: any, scenarioId: string) {
 }
 
 /** Appends an accessibility cart dispatch notice to fan messages when step-free routes are blocked. */
-export function applySpatialMessageGuard(fanMessage: string, spatialChecks: any) {
+export function applySpatialMessageGuard(fanMessage: string, spatialChecks: { accessibleAssistanceSafe: boolean }) {
   if (spatialChecks.accessibleAssistanceSafe) return fanMessage;
   return `${fanMessage} Staff are dispatching mobile accessibility carts because one or more step-free paths are blocked or uncertain.`;
 }
 
-export function addMultilingualDispatch(actions: ActionCommand[], multilingualMessages: any[], scenarioId: string): ActionCommand[] {
+export function addMultilingualDispatch(actions: ActionCommand[], multilingualMessages: { label: string; [key: string]: any }[], scenarioId: string): ActionCommand[] {
   const languages = multilingualMessages.map((message) => message.label).join(", ");
   return [
     ...actions,
@@ -408,7 +409,7 @@ export function localFallbackActions(scenario: any, scenarioId: string, _edgeAle
   return fallbackActions;
 }
 
-export function buildVerificationPlan(state: StoreState, _zoneValues: any, _metric: RuntimeMetrics): FanVerification {
+export function buildVerificationPlan(state: StoreState, _zoneValues: Record<string, number | null>, _metric: RuntimeMetrics): FanVerification {
   const base = state.fanVerification;
   const statusCopy = base.status === "below_target"
     ? "Compliance below target; increase physical signage, LED frequency, and volunteer intercepts."
@@ -540,7 +541,7 @@ export function simpleHash(text: string) {
   return Math.abs(hash).toString(16).padStart(8, "0");
 }
 
-export async function signPayload(payload: any, operator = "ops-supervisor-demo") {
+export async function signPayload(payload: unknown, operator = "ops-supervisor-demo") {
   const serialized = JSON.stringify(payload);
   const secret = authorizedOperatorSessions[operator];
   if (!secret) throw new Error("Unauthorized operator session");
