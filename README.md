@@ -2,6 +2,8 @@
 
 This folder is a production-readiness scaffold for the prototype command center. It keeps the original product behavior but moves it to strict TypeScript, Solid.js, domain modules, workerized computation, signed dispatch, CI, infrastructure, and operations documentation.
 
+![StadiumOps Copilot dashboard](docs/ui-screenshot.png)
+
 ## Refactored Codebase Structure
 
 ```text
